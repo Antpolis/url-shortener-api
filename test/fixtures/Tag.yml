@@ -1,0 +1,57 @@
+entity: Tag
+items:
+  Tag{1..5}:
+    key: "client"
+    value: "{{random.word}}"
+    createdAt: "{{date.past}}"
+    updatedAt: "{{date.past}}"
+    deletedAt: NULL
+
+  Tag{6..10}:
+    key: "campaign"
+    value: "{{random.word}}"
+    createdAt: "{{date.past}}"
+    updatedAt: "{{date.past}}"
+    deletedAt: NULL
+
+  Tag11:
+    key: "client"
+    value: "blueberry"
+    createdAt: "{{date.past}}"
+    updatedAt: "{{date.past}}"
+    deletedAt: NULL
+
+  Tag12:
+    key: "campaign"
+    value: "berries"
+    createdAt: "{{date.past}}"
+    updatedAt: "{{date.past}}"
+    deletedAt: NULL
+
+  Tag{13..22}:
+    key: "client"
+    value: "{{random.word}}"
+    createdAt: "{{date.past}}"
+    updatedAt: "{{date.past}}"
+    deletedAt: NULL
+
+  Tag{23..30}:
+    key: "campaign"
+    value: "{{random.word}}"
+    createdAt: "{{date.past}}"
+    updatedAt: "{{date.past}}"
+    deletedAt: NULL
+
+  Tag31:
+    key: "client"
+    value: "squares"
+    createdAt: "{{date.past}}"
+    updatedAt: "{{date.past}}"
+    deletedAt: NULL
+
+  Tag32:
+    key: "campaign"
+    value: "shapes"
+    createdAt: "{{date.past}}"
+    updatedAt: "{{date.past}}"
+    deletedAt: NULL

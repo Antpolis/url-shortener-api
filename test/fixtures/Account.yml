@@ -1,0 +1,7 @@
+entity: Account
+items:
+  Account1:
+    id: 1
+    name: "test"
+    contactEmail: "test@test.com"
+    deletedAt: NULL

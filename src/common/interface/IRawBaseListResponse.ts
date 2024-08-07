@@ -1,0 +1,1 @@
+export type IRawBaseListResponse<T> = [T[], number]

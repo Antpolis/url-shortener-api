@@ -1,0 +1,37 @@
+entity: Domain
+items:
+  Domain1:
+    id: 1
+    accountID: 1
+    totalShortenURL: 0
+    domain: "dv.sg"
+    active: 1
+    system: 0
+    defaultLink: "https://dailyvanity.sg/"
+    createdAt: "{{date.past}}"
+    updatedAt: "{{date.past}}"
+    deletedAt: NULL
+
+  Domain2:
+    id: 2
+    accountID: 1
+    totalShortenURL: 0
+    domain: "av1.sg"
+    active: 0
+    system: 0
+    defaultLink: "https://avenueone.sg"
+    createdAt: "{{date.past}}"
+    updatedAt: "{{date.past}}"
+    deletedAt: NULL
+
+  Domain3:
+    id: 3
+    accountID: 1
+    totalShortenURL: 0
+    domain: "redirect.tipsy.darvis.dev"
+    active: 1
+    system: 0
+    defaultLink: "https://dailyvanity.sg/1"
+    createdAt: "{{date.past}}"
+    updatedAt: "{{date.past}}"
+    deletedAt: NULL

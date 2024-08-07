@@ -1,0 +1,64 @@
+name: Deployment to tipsy server
+
+on: 
+  push:
+    tags:
+      - v**-rc*
+      - V**-rc*
+    branches:
+      - dev
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 20
+    - name: npm install, build
+      run: |
+        npm install
+        npm run build
+    - name: Extract branch name
+      shell: bash
+      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF##*/})"
+      id: extract_branch    
+    - name: Build and Push image
+      uses: antpolis/Publish-Docker-Github-Action@main
+      with:
+        name: antpolis/url-shortener-api
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        dockerfile: Dockerfile
+        tags: "dev-latest,${{ steps.extract_branch.outputs.branch }}"
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v3
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF##*/})"
+        id: extract_branch
+      - name: Create SSH Key file
+        shell: bash
+        run: |
+          echo "${{ secrets.CI_PRIVATE_KEY }}" > ssh_key
+      - name: Execute Ansible Playbook - Tipsy
+        uses: saubermacherag/ansible-playbook-docker-action@v1.4
+        with:
+          playbookName: '.ansible/deployment.yml'
+          inventoryFile: '.ansible/inventories/tipsy/hosts'
+          requirementsFile: '.ansible/requirements-ci.yml'
+          keyFile: './ssh_key'
+          keyFileVaultPass: ${{ secrets.ANSIBLE_VAULT_PASS }}
+          extraVars: |
+            -e DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }} 
+            -e DOCKER_PASSWORD=${{ secrets.DOCKER_PASSWORD }} 
+            -e DOCKER_REPO_TAG=${{ steps.extract_branch.outputs.branch }} 
+            -e PROJECT_TAG=${{ steps.extract_branch.outputs.branch }}
+          galaxyGithubUser: ${{ secrets.GIT_USERNAME }}
+          galaxyGithubToken: ${{ secrets.GIT_PASSWORD }}
+          rolesPath: ".ansible/roles"
+
