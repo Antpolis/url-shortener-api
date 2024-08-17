@@ -17,13 +17,7 @@ export function CommonMessageResponse(message: string, result:ResultType='succes
   }
 }
 
-export async function CommonListResponse<T>(data: [T[], number] | Promise<[T[], number]> | any, res?: Response): Promise<IBaseListResponse<T>> {
-  if(isPromise(data)) {
-    data = await data
-  }
-  if(res) {
-    res.setHeader('X-Total-Length', data[1])
-  }
+export function CommonListResponse<T>(data: [T[], number], res?: Response): Promise<IBaseListResponse<T>> {
   return {
     total: data[1],
     data: data[0]

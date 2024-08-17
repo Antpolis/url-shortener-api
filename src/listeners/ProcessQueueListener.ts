@@ -1,8 +1,8 @@
 import { getCustomRepository } from "typeorm";
-import { Url, UrlRepository } from "../repositories/UrlRepository";
-import { RequestRepository, Request } from "../repositories/RequestRepository";
-import { GeoLocationRepository } from "../repositories/GeoLocationRepository";
-import { RequestLocation, RequestLocationRepository } from "../repositories/RequestLocationRepository";
+import { Url, UrlRepository } from "../services/Url.service";
+import { RequestRepository, Request } from "../services/Request.service";
+import { GeoLocationRepository } from "../services/GeoLocationRepository";
+import { RequestLocation, RequestLocationRepository } from "../services/RequestLocation.service";
 import moment = require("moment");
 import { AWSConfig } from "../../config/aws";
 import { botsAndSpidersFiltering } from "../helpers";

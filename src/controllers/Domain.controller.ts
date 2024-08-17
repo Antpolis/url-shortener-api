@@ -1,43 +1,45 @@
-import { JsonController, Param, Get, Post, Put, Delete, QueryParams, UseInterceptor, Authorized } from "routing-controllers";
-import { Domain, DomainRepository } from "../repositories/DomainRepository";
-import { getCustomRepository } from "typeorm";
-import { restore, softDelete } from "../helpers";
-import { ListResponseInterceptor } from "../interceptors/ListResponseInterceptor";
-import { ISearchDomain } from "../common/interface/ISearchDomain";
-import { AWSConfig } from "../../config/aws";
-var result: any;
-var res: object = new Object();
-var query: any;
+import {
+  JsonController,
+  Param,
+  Get,
+  Post,
+  Put,
+  Delete,
+  QueryParams,
+  UseInterceptor,
+  Authorized,
+} from 'routing-controllers';
+import { Domain, DomainRepository, DomainService } from '../services/Domain.service';
+import { getCustomRepository } from 'typeorm';
+import { restore, softDelete } from '../helpers';
+import { ListResponseInterceptor } from '../interceptors/ListResponseInterceptor';
+import { IQuerySearchDomain, ISearchDomain } from '../common/interface/IQuerySearchDomain';
+import { AWSConfig } from '../../config/aws';
+let result: any;
+let res: object = new Object();
+let query: any;
 
-@JsonController("/domain")
+@JsonController('/domain')
 export class DomainController {
-  domainRepo: DomainRepository;
 
-  constructor() {
-    this.domainRepo = getCustomRepository(DomainRepository);
+  constructor(private readonly domainService: DomainService) {
+    
   }
   
-  @Authorized(AWSConfig.auth.darvisRole)
-  @Get("/all")
-  async getAllDomains() {
-    return await this.domainRepo.getDomain().where("domain.active = 1").getMany();
-  }
-
-  @Authorized(AWSConfig.auth.darvisRole)
   @Get('/list')
   @UseInterceptor(ListResponseInterceptor)
-  async list(@QueryParams() req: ISearchDomain) {
-    return await this.domainRepo.list(req).getManyAndCount();
+  async list(@QueryParams() req: IQuerySearchDomain) {
+    return await this.domainService.list(req).getManyAndCount();
   }
 
   @Authorized(AWSConfig.auth.darvisRole)
-  @Get("/:id")
-  async getDomainById(@Param("id") id: number) {
+  @Get('/:id')
+  async getDomainById(@Param('id') id: number) {
     return await this.domainRepo.getDomainById(id).getOne();
   }
 
   @Authorized(AWSConfig.auth.darvisRole)
-  @Post("/create")
+  @Post('/create')
   async addNewDomain(@QueryParams() domain: Domain) {
     if (!domain.accountID) {
       throw new Error(`Validation failed! Empty Account ID`);
@@ -47,7 +49,9 @@ export class DomainController {
       throw new Error(`Validation failed! Empty Default Link`);
     } else {
       // Check if Domain is already in database
-      const isAvailable = await this.domainRepo.getDomainByName(domain.domain).getOne();
+      const isAvailable = await this.domainRepo
+        .getDomainByName(domain.domain)
+        .getOne();
 
       if (isAvailable === undefined) {
         const currentDateAndTime: Date = new Date();
@@ -65,29 +69,31 @@ export class DomainController {
           .catch(function (err) {
             if (err) {
               return (res = {
-                status: "fail",
+                status: 'fail',
               });
             }
           });
 
         // Retrieve the entry from the db to get "id"
-        const newEntry = await this.domainRepo.getDomainByName(domain.domain).getOne();
+        const newEntry = await this.domainRepo
+          .getDomainByName(domain.domain)
+          .getOne();
 
         return (res = {
-          status: "Success",
+          status: 'Success',
           id: newEntry.id,
           domain: newEntry.domain,
           createdAt: newEntry.createdAt,
         });
       } else {
-        return (res = { status: "This Domain already exists in our database" });
+        return (res = { status: 'This Domain already exists in our database' });
       }
     }
   }
 
   @Authorized(AWSConfig.auth.darvisRole)
-  @Put("/update/:id")
-  async updateDomain(@QueryParams() domain: Domain, @Param("id") id: number) {
+  @Put('/update/:id')
+  async updateDomain(@QueryParams() domain: Domain, @Param('id') id: number) {
     const currentDateAndTime: Date = new Date();
     domain.updatedAt = currentDateAndTime;
 
@@ -99,7 +105,7 @@ export class DomainController {
       .catch(function (err) {
         if (err) {
           return (res = {
-            status: "fail",
+            status: 'fail',
           });
         }
       })
@@ -107,42 +113,48 @@ export class DomainController {
         const entity = await this.domainRepo.getDomainById(id).getOne();
 
         return (res = {
-          status: "Success",
+          status: 'Success',
           id: entity.id,
           lastModifiedDate: entity.updatedAt,
         });
       });
 
-    if (result.status === "fail") {
-      throw new Error("There is a technical issue with updating this Domain, try again later");
-    } else if (result.status === "Success") {
+    if (result.status === 'fail') {
+      throw new Error(
+        'There is a technical issue with updating this Domain, try again later',
+      );
+    } else if (result.status === 'Success') {
       return result;
     } else {
-      throw new Error("No such Domain can be found in our database");
+      throw new Error('No such Domain can be found in our database');
     }
   }
 
   @Authorized(AWSConfig.auth.darvisRole)
-  @Put("/restore/:id")
-  async restoreDomain(@Param("id") id: number) {
+  @Put('/restore/:id')
+  async restoreDomain(@Param('id') id: number) {
     query = this.domainRepo.getDomainById(id);
     result = await restore(query);
 
-    if (result.status === "Fail") {
-      throw new Error("There is a technical issue with restoring this domain, try again later");
+    if (result.status === 'Fail') {
+      throw new Error(
+        'There is a technical issue with restoring this domain, try again later',
+      );
     } else {
       return result;
     }
   }
 
   @Authorized(AWSConfig.auth.darvisRole)
-  @Delete("/delete/:id")
-  async deleteDomain(@Param("id") id: number) {
+  @Delete('/delete/:id')
+  async deleteDomain(@Param('id') id: number) {
     query = this.domainRepo.getDomainById(id);
     result = await softDelete(query);
 
-    if (result.status === "Fail") {
-      throw new Error("There is a technical issue with deleting this domain, try again later");
+    if (result.status === 'Fail') {
+      throw new Error(
+        'There is a technical issue with deleting this domain, try again later',
+      );
     } else {
       return result;
     }

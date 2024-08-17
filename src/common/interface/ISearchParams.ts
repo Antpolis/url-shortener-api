@@ -1,10 +1,9 @@
 export interface ISearchParams {
-    limit?: number
-    order?:string
-    orderBy?: any
-    page?:number
-    offset?:number
-    searchText?:string
-    countryOfOrigin?:string
+  limit?: number;
+  order?: string;
+  orderBy?: any;
+  page?: number;
+  offset?: number;
+  searchText?: string;
+  countryOfOrigin?: string;
 }
-

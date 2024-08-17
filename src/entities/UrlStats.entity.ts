@@ -1,23 +1,19 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-} from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
-@Entity("urlStats")
+@Entity('urlStats')
 export class UrlStats {
   @PrimaryGeneratedColumn({ unsigned: true })
   id: number;
 
-  @Column({ type: "int"})
+  @Column({ type: 'int' })
   urlID: number;
 
-  @Column({ type: "datetime", nullable: true })
+  @Column({ type: 'datetime', nullable: true })
   lastRequested?: Date;
 
-  @Column({ type: "int", nullable: true })
+  @Column({ type: 'int', nullable: true })
   totalRequested?: number;
 
-  @Column({ type: "int", nullable: true })
+  @Column({ type: 'int', nullable: true })
   totalUniqueRequested?: number;
 }

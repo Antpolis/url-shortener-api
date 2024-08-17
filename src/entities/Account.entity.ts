@@ -1,21 +1,22 @@
-import { Entity, PrimaryGeneratedColumn, Column, DeleteDateColumn, OneToMany, Repository, EntityRepository } from "typeorm";
-import { Url } from "./Url.entity";
-import { Audit } from "src/common/abstract/Audit";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Url } from './Url.entity';
+import { Audit } from 'src/common/abstract/Audit';
+import { IsAccountExist } from 'src/common/validators/isAccountExists';
+import { IsEmail } from 'class-validator';
 
-@Entity("account")
+@Entity('account')
 export class Account extends Audit {
   @PrimaryGeneratedColumn({ unsigned: true })
   id?: number;
 
-  @Column({ type: "varchar", length: 255, nullable: true })
+  @IsAccountExist()
+  @Column({ type: 'varchar', length: 255, nullable: true })
   name?: string;
 
-  @Column({ type: "varchar", length: 255, nullable: true })
+  @IsEmail()
+  @Column({ type: 'varchar', length: 255, nullable: true })
   contactEmail?: string;
 
-  @Column({ type: "varchar", length: 255, nullable: true })
-  cognitoID?: Date;
-
-  @OneToMany(() => Url, (url) => url.account, {lazy: true})
+  @OneToMany(() => Url, (url) => url.account, { lazy: true })
   url?: Promise<Url[]>;
 }

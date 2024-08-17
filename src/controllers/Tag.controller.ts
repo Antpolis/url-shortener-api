@@ -1,5 +1,5 @@
 import { JsonController, Param, Get, Put, Delete, QueryParams, UseInterceptor, Post, Body, Authorized } from "routing-controllers";
-import { TagRepository, Tag } from "../repositories/TagRepository";
+import { TagRepository, Tag } from "../services/Tag.service";
 import { getCustomRepository } from "typeorm";
 import { restore, softDelete } from "../helpers";
 import { ListResponseInterceptor } from "../interceptors/ListResponseInterceptor";

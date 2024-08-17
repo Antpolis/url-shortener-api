@@ -1,24 +1,29 @@
-import { Column, CreateDateColumn, DeleteDateColumn, UpdateDateColumn } from "typeorm";
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 export abstract class Audit {
-  @Column({ type: "varchar", length: 36 })
+  @Column({ type: 'varchar', length: 36 })
   createdBy: string;
 
-  @UpdateDateColumn({name: "lastModifiedDate"})
+  @UpdateDateColumn({ name: 'lastModifiedDate' })
   lastModifiedDate: Date;
 
-  @CreateDateColumn({name: "createdDate"})
+  @CreateDateColumn({ name: 'createdDate' })
   createdDate: Date;
 
-  @DeleteDateColumn({name: "deletedDate", nullable: true})
+  @DeleteDateColumn({ name: 'deletedDate', nullable: true })
   deletedDate?: Date;
 
-  @Column({ type: "varchar", length: 36 })
+  @Column({ type: 'varchar', length: 36 })
   lastModifiedBy: string;
 
-  @Column({ type: "varchar", length: 36, nullable: true })
+  @Column({ type: 'varchar', length: 36, nullable: true })
   deletedBy?: string;
 
-  @Column({ type: "boolean", default: true })
+  @Column({ type: 'boolean', default: true })
   isActive: boolean;
 }

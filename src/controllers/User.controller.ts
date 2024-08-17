@@ -1,5 +1,5 @@
 import { JsonController, Param, Get, Post, Put, Delete, QueryParams, Authorized } from "routing-controllers";
-import { User, UserRepository } from "../repositories/UserRepository";
+import { User, UserRepository } from "../services/User.service";
 import { getCustomRepository } from "typeorm";
 import { restore, softDelete } from "../helpers";
 import { AWSConfig } from "../../config/aws";

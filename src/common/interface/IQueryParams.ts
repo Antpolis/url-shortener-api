@@ -1,10 +1,10 @@
-import { SortDirectionType } from "../../enums/SortDirectionType"
-
-export interface IQueryParams {
-    page: number
-    take: number
-    columnToSort?: string 
-    sortDirection?: SortDirectionType
-    startDate?:string
-    endDate?:string
+export interface IQuerySearchParams {
+  page: number;
+  take: number;
+  order?: string;
+  orderBy?: any;
+  offset?: number;
+  columnToSort?: string;
+  searchText?: string;
+  deleted?: boolean;
 }

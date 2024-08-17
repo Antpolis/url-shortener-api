@@ -1,5 +1,5 @@
 import { JsonController, Param, Get, QueryParams, Authorized } from "routing-controllers";
-import { RequestRepository, Request } from "../repositories/RequestRepository";
+import { RequestRepository, Request } from "../services/Request.service";
 import { getCustomRepository } from "typeorm";
 import { deDupe, getOccurrence, compareValues } from "../helpers";
 import * as moment from "moment";

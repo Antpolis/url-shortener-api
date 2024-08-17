@@ -1,4 +1,4 @@
-import { UrlRepository } from "../src/repositories/UrlRepository";
+import { UrlRepository } from "../src/services/Url.service";
 import { SiteController } from "../src/controllers/Site.controller";
 import { createTypeormConn, closeTypeormConn } from "./createTypeormConnection";
 import { getCustomRepository } from "typeorm";

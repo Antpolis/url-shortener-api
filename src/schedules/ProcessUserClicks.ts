@@ -1,5 +1,5 @@
-import { RequestRepository } from "../repositories/RequestRepository";
-import { Url, UrlRepository } from "../repositories/UrlRepository";
+import { RequestRepository } from "../services/Request.service";
+import { Url, UrlRepository } from "../services/Url.service";
 import moment = require("moment");
 import { getCustomRepository } from "typeorm";
 

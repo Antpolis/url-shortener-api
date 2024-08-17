@@ -1,13 +1,13 @@
 import { JsonController, Param, Get, Post, Put, Delete, QueryParams, Body, CurrentUser, UseInterceptor, BadRequestError, NotFoundError, Authorized } from "routing-controllers";
-import { Domain, DomainRepository } from "../repositories/DomainRepository";
-import { Url, UrlRepository } from "../repositories/UrlRepository";
-import { RequestRepository } from "../repositories/RequestRepository";
-import { Tag, TagRepository } from "../repositories/TagRepository";
+import { Domain, DomainRepository } from "../services/Domain.service";
+import { Url, UrlRepository } from "../services/Url.service";
+import { RequestRepository } from "../services/Request.service";
+import { Tag, TagRepository, TagService } from "../services/Tag.service";
 import { getCustomRepository } from "typeorm";
 import { restore, softDelete, generateNewHash } from "../helpers";
-import { AccountRepository } from "../repositories/AccountRepository";
-import { UrlOwnerLogRepository, Url_Owner_Log } from "../repositories/UrlOwnerLogRepository";
-import { User, UserRepository } from "../repositories/UserRepository";
+import { AccountRepository } from "../services/Account.service";
+import { UrlOwnerLogRepository, Url_Owner_Log } from "../services/UrlOwnerLogRepository";
+import { User, UserRepository } from "../services/User.service";
 import { IQueryParams } from "../common/interface/IQueryParams";
 import { ISearchUrlParams } from "../common/interface/ISearchUrlParams";
 import { ICreateUrlParams } from "../common/interface/ICreateUrlParams";
@@ -25,16 +25,15 @@ export class UrlController {
   accountRepo: AccountRepository;
   reqRepo: RequestRepository;
   domainRepo: DomainRepository;
-  tagRepo: TagRepository;
   userRepo: UserRepository;
 
-  constructor() {
+  constructor(private readonly tagService: TagService) {
     this.urlRepo = getCustomRepository(UrlRepository);
     this.urlOwnerLogRepo = getCustomRepository(UrlOwnerLogRepository);
     this.accountRepo = getCustomRepository(AccountRepository);
     this.reqRepo = getCustomRepository(RequestRepository);
     this.domainRepo = getCustomRepository(DomainRepository);
-    this.tagRepo = getCustomRepository(TagRepository);
+    
     this.userRepo = getCustomRepository(UserRepository);
   }
   
@@ -260,8 +259,8 @@ export class UrlController {
   }
 
   @Authorized(AWSConfig.auth.darvisRole)
-  @Post("/create")
-  async addNewUrl(@Body({ validate: true }) model: ICreateUrlParams, @CurrentUser() user: any) {
+  @Post("/save")
+  async save(@Body({ validate: true }) model: ICreateUrlParams, @CurrentUser() user: any) {
 
     let req = model;
     if (req.accountID == null || req.accountID == 0) {
@@ -297,6 +296,8 @@ export class UrlController {
     newUrl.accountID = req.accountID;
     newUrl.campaignID = req.campaignID;
     newUrl.clientID = req.clientID;
+    newUrl.clientName = req.clientName;
+    newUrl.campaignName = req.campaignName;
 
     if (req.ownerName) {
       try {
@@ -346,32 +347,18 @@ export class UrlController {
     // Generate the fullUrl, which is domainUrl + Hash
     newUrl.fullURL = domainUrl + "/" + req.hash;
 
-    if(!req.clientID) {
-      // Check if the clientName is available in the db
-      if (req.clientName) {
-        client = await this.tagRepo.getTag({name:req.clientName, key:"client"}).getOne();
-        // Create new entry if clientName is not found in tag table
-        if (client === undefined) {
-          await this.tagRepo.saveNewTag("client", req.clientName);
-        }
-      }
-
-      let newClient = await this.tagRepo.getTag({name:req.clientName, key:"client"}).getOne();
-      newUrl.clientID = newClient.id;
+    if (!newUrl.clientID && newUrl.clientName) {
+      client = await this.tagService.findOrCreate(
+        this.tagService.createTagByKey('client', req.clientName),
+      );
+      newUrl.clientID = client?.id;
     }
-    
-    if(!req.campaignID) {
-      // Check if the campaignName is available in the db
-      if (req.campaignName) {
-        campaign = await this.tagRepo.getTag({name:req.campaignName, key:"campaign"}).getOne();
-        // Create new entry if campaignName is not found in tag table
-        if (campaign === undefined) {
-          await this.tagRepo.saveNewTag("campaign", req.campaignName);
-        }
-      }
 
-      let newCampaign = await this.tagRepo.getTag({name:req.campaignName, key:"campaign"}).getOne();
-      newUrl.campaignID = newCampaign.id;
+    if (!newUrl.campaignID && newUrl.campaignName) {
+      campaign = await this.tagService.findOrCreate(
+        this.tagService.createTagByKey('campaign', req.campaignName),
+      );
+      newUrl.campaignID = campaign.id;
     }
 
     newUrl.tags = [];
@@ -517,11 +504,11 @@ export class UrlController {
           const client = await this.tagRepo.getTag({name:req.clientName, key:"client"}).getOne();
           // Create new entry if clientName is not found in tag table
           if (client === undefined) {
-            await this.tagRepo.saveNewTag("client", req.clientName);
+            await this.tagService.findOrCreate("client", req.clientName);
           }
         }
   
-        let newClient = await this.tagRepo.getTag({name:req.clientName, key:"client"}).getOne();
+        let newClient = await this.tagService.getTag({name:req.clientName, key:"client"}).getOne();
         newUrlEntity.clientID = newClient.id;
         newUrlEntity.tags.push(newClient)
       }
@@ -534,10 +521,10 @@ export class UrlController {
       if(!req.campaignID) {
         // Check if the campaignName is available in the db
         if (req.campaignName) {
-          const campaign = await this.tagRepo.getTag({name:req.campaignName, key:"campaign"}).getOne();
+          const campaign = await this.tagService.getTag({name:req.campaignName, key:"campaign"}).getOne();
           // Create new entry if campaignName is not found in tag table
           if (campaign === undefined) {
-            await this.tagRepo.saveNewTag("campaign", req.campaignName);
+            await this.tagService.findOrCreate("campaign", req.campaignName);
           }
         }
 
