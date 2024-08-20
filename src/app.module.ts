@@ -12,13 +12,33 @@ import { JWTConfig } from 'config/jwt';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { LocalAuthGuardInterceptor } from './interceptors/LocalAuthGuardInterceptor';
 import { ListResponseInterceptor } from './interceptors/ListResponseInterceptor';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import config from 'config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      envFilePath: ['config/.env'],
+      load: [config],
+    }),
     JwtModule.register({
       global: true,
       secret: JWTConfig.secret,
       signOptions: { expiresIn: '60s' },
+    }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        type: 'mysql',
+        host: configService.get('database.host'),
+        port: +configService.get('database.port'),
+        username: configService.get('database.username'),
+        password: configService.get('database.password'),
+        database: configService.get('database.database'),
+        entities: [],
+        synchronize: true,
+      }),
     }),
   ],
   controllers: [AccountController],
