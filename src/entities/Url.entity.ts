@@ -4,10 +4,13 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
-} from 'typeorm';
-import { Domain } from './Domain.entity';
-import { Account } from './Account.entity';
-import { Audit } from 'src/common/abstract/Audit';
+  JoinTable,
+  ManyToMany,
+} from "typeorm";
+import { Domain } from "./Domain.entity";
+import { Tag } from "./Tag.entity";
+import { Account } from "./Account.entity";
+import { Audit } from "src/common/abstract/Audit";
 
 @Entity('url')
 export class Url extends Audit {

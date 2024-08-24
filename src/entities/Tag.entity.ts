@@ -1,5 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
-import { Audit } from 'src/common/abstract/Audit';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany } from "typeorm";
+import { Audit } from "src/common/abstract/Audit";
 
 @Entity('tag')
 export class Tag extends Audit {

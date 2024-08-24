@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { AppService } from './app.service';
 import { AccountController } from './controllers/Account.controller';
 import { AccountService } from './services/Account.service';
 import { DomainService } from './services/Domain.service';
